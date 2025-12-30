@@ -14,10 +14,14 @@
         }
 
         html, body {
-            height: 100%;
             width: 100%;
-            overflow: hidden;
+            height: 100%;
+            margin: 0;
+            overflow-x: hidden;   /* tetap aman dari geser horizontal */
+            overflow-y: auto;     /* biar HP bisa scroll */
+            -webkit-overflow-scrolling: touch;
         }
+
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -738,6 +742,67 @@
                 padding: 0.625rem;
             }
         }
+
+        /* ===========================
+        MOBILE RESPONSIVE OVERRIDES
+        taruh PALING BAWAH sebelum </style>
+        =========================== */
+
+        @media (max-width: 640px) {
+        /* Biar halaman bisa scroll normal (hindari nested scroll di HP) */
+        .main-container { 
+            overflow: visible; 
+            padding: 0.75rem;
+        }
+
+        .card,
+        .results-history-container,
+        .results-section,
+        .card-content,
+        .input-grid {
+            overflow: visible !important;
+        }
+
+        /* Input jadi 1 kolom */
+        .input-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Header & model path biar ga mepet */
+        .header {
+            padding: 0.65rem 0.9rem;
+            text-align: center;
+        }
+
+        .card-header {
+            gap: 0.6rem;
+        }
+
+        .model-path-wrapper {
+            flex-direction: column;
+            align-items: stretch;
+            max-width: 100% !important;
+        }
+
+        .current-model-badge {
+            align-self: flex-start;
+        }
+
+        /* Biar gambar/result ga kepotong */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        }
+
+        @media (max-width: 420px) {
+            .header h1 { font-size: 0.95rem; }
+            .header p  { font-size: 0.72rem; }
+
+            .card-header h2 { font-size: 0.98rem; }
+            .submit-btn { padding: 0.85rem 1rem; font-size: 0.88rem; }
+        }
+
     </style>
 </head>
 <body>

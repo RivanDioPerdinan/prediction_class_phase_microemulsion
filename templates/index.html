@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microemulsion Phase Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8f1ff 50%, #f5f7ff 100%);
+            color: #1a202c;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+            flex-shrink: 0;
+        }
+
+        .header h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #db2777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.15rem;
+        }
+
+        .header p {
+            color: #4b5563;
+            font-size: 0.8rem;
+        }
+
+        /* Main container */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1.1fr 1.2fr;
+            gap: 1.25rem;
+            padding: 1rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* Card base */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(37, 99, 235, 0.15);
+            border-radius: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            padding: 1rem;
+            border-bottom: 2px solid rgba(37, 99, 235, 0.1);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: space-between;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .card-header svg {
+            width: 22px;
+            height: 22px;
+            color: #2563eb;
+            stroke: #2563eb;
+            flex-shrink: 0;
+        }
+
+        .model-path-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.75rem;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .model-path-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1;
+        }
+
+        .model-path-input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .model-path-input-group input {
+            background: #ffffff;
+            border: 1.5px solid rgba(37, 99, 235, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.85rem;
+            font-size: 0.8rem;
+            color: #1a202c;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .model-path-input-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .model-path-input-group input::placeholder {
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .current-model-badge {
+            font-size: 0.7rem;
+            color: #2563eb;
+            font-weight: 700;
+            white-space: nowrap;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.4rem;
+            border: 1px solid rgba(37, 99, 235, 0.2);
+            flex-shrink: 0;
+        }
+
+        .card-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .card-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-content::-webkit-scrollbar-track {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .card-content::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .card-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 99, 235, 0.5);
+        }
+
+        /* Input Parameters Grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .input-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .input-grid::-webkit-scrollbar-track {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .input-grid::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .input-grid::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 99, 235, 0.5);
+        }
+
+        /* Form sections */
+        .form-section {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 1.5px solid rgba(37, 99, 235, 0.12);
+            border-radius: 0.625rem;
+            padding: 0.875rem;
+        }
+
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #2563eb;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background: #ffffff;
+            border: 1.5px solid rgba(37, 99, 235, 0.2);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            font-size: 0.85rem;
+            color: #1a202c;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%232563eb' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 0.9rem;
+            cursor: pointer;
+            padding-right: 2.25rem;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        .current-model {
+            font-size: 0.75rem;
+            color: #2563eb;
+            font-weight: 700;
+            margin-top: 0.4rem;
+        }
+
+        .current-model span {
+            color: #1a202c;
+        }
+
+        /* Submit button */
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 0.625rem;
+            padding: 0.9rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+            flex-shrink: 0;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+        }
+
+        /* Results Container */
+        .results-history-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+
+        .results-section::-webkit-scrollbar,
+        .history-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .results-section::-webkit-scrollbar-track,
+        .history-section::-webkit-scrollbar-track {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .results-section::-webkit-scrollbar-thumb,
+        .history-section::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .results-section::-webkit-scrollbar-thumb:hover,
+        .history-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 99, 235, 0.5);
+        }
+
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #1a202c;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Results section */
+        .result-main {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+            border: 2px solid rgba(37, 99, 235, 0.3);
+            border-radius: 0.625rem;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-image {
+            margin-top: 1rem;
+            border-radius: 0.625rem;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 1.5px solid rgba(37, 99, 235, 0.15);
+            min-height: 240px;
+            max-height: 280px;
+        }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .result-image-caption {
+            font-size: 0.75rem;
+            color: #4b5563;
+            margin-top: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 2rem 1rem;
+            text-align: center;
+            color: #6b7280;
+            flex: 1;
+        }
+
+        .empty-state svg {
+            width: 70px;
+            height: 70px;
+            opacity: 0.25;
+            stroke: #2563eb;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* History table */
+        .history-table-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            border: 1.5px solid rgba(37, 99, 235, 0.2);
+            border-radius: 0.625rem;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-table thead {
+            flex-shrink: 0;
+        }
+
+        .history-table thead tr {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(124, 58, 237, 0.08) 100%);
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 0.65rem 0.75rem;
+            font-weight: 800;
+            color: #1a202c;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.08em;
+            border-right: 1px solid rgba(37, 99, 235, 0.15);
+            border-bottom: 2px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .history-table th:last-child {
+            border-right: none;
+        }
+
+        .history-table tbody {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .history-table tbody::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .history-table tbody::-webkit-scrollbar-track {
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .history-table tbody::-webkit-scrollbar-thumb {
+            background: rgba(37, 99, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .history-table tbody::-webkit-scrollbar-thumb:hover {
+            background: rgba(37, 99, 235, 0.5);
+        }
+
+        .history-table td {
+            padding: 0.65rem 0.75rem;
+            border-right: 1px solid rgba(37, 99, 235, 0.1);
+            border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+            color: #374151;
+        }
+
+        .history-table td:last-child {
+            border-right: none;
+        }
+
+        .history-table tbody tr:hover {
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .prediction-badge {
+            display: inline-block;
+            padding: 0.35rem 0.65rem;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(124, 58, 237, 0.12) 100%);
+            border: 1.5px solid rgba(37, 99, 235, 0.3);
+            border-radius: 0.35rem;
+            font-weight: 800;
+            color: #2563eb;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+
+        .empty-cell {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .history-footer {
+            flex-shrink: 0;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(37, 99, 235, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination-info {
+            font-size: 0.7rem;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .pagination-buttons {
+            display: flex;
+            gap: 0.35rem;
+            align-items: center;
+        }
+
+        .pagination-btn {
+            background: rgba(37, 99, 235, 0.1);
+            border: 1.5px solid rgba(37, 99, 235, 0.2);
+            color: #2563eb;
+            padding: 0.4rem 0.65rem;
+            border-radius: 0.35rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: rgba(37, 99, 235, 0.4);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-numbers {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .page-number {
+            background: rgba(37, 99, 235, 0.08);
+            border: 1.5px solid rgba(37, 99, 235, 0.15);
+            color: #374151;
+            padding: 0.4rem 0.55rem;
+            border-radius: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 1.8rem;
+            text-align: center;
+        }
+
+        .page-number:hover {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .page-number.active {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-color: #2563eb;
+            color: white;
+        }
+        .toggle-btn {
+            margin-top:6px;
+            padding:4px 8px;
+            font-size:11px;
+            border:1px solid #2563eb;
+            background:white;
+            border-radius:6px;
+            cursor:pointer;
+            color:#2563eb;
+        }
+        .value-label {
+            display:block;
+            font-size:12px;
+            font-weight:700;
+            margin-top:4px;
+        }
+        .toggle-wrap {
+            display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+            margin-top:4px;
+        }
+        .toggle-wrap input { cursor:pointer; }
+        .manual-input { 
+            display:none; 
+            margin-top:5px;
+        }
+        .slider-input {
+            width:100%;
+        }
+
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .main-container {
+                gap: 1rem;
+                padding: 0.875rem;
+            }
+
+            .card-header {
+                padding: 0.875rem;
+            }
+
+            .card-content {
+                padding: 0.875rem;
+            }
+
+            .form-section {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+        }
+
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1rem;
+            }
+
+            .header p {
+                font-size: 0.75rem;
+            }
+
+            .main-container {
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .card-header {
+                padding: 0.75rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .model-path-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .card-content {
+                padding: 0.75rem;
+            }
+
+            .form-section {
+                padding: 0.625rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🔬 Microemulsion Phase Classification Prediction</h1>
+        <p>Advanced Analytical Platform for Microemulsion System Characterization</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Column: Input Parameters -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                    <h2>Input Parameters</h2>
+                </div>
+                <div class="model-path-wrapper">
+                    <div class="model-path-input-group">
+                        <label for="model_path">Model Path</label>
+                        <input type="text" id="model_path" name="model_path" placeholder="e.g., models/naivebayes_all.pkl">
+                    </div>
+                    {% if current_model_name %}
+                    <div class="current-model-badge">{{ current_model_name }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <form method="POST" style="display: flex; flex-direction: column; gap: 0.75rem; flex: 1; min-height: 0;">
+                <div class="input-grid">
+                    <!-- Row 1: Oil Component (Left) -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                            Oil Component
+                        </div>
+                        <div class="form-group">
+                            <label for="minyak">Type</label>
+                            <select id="minyak" name="MINYAK" required>
+                                <option value="">-- Select --</option>
+                                {% for val in cat_values['MINYAK'] %}
+                                    <option value="{{ val }}">{{ display_values['MINYAK'][val] if val in display_values['MINYAK'] else val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jumlah_minyak">Amount (g)</label>
+
+                            <div class="toggle-wrap">
+                                <input type="checkbox" id="toggle_minyak" onchange="toggleInput('minyak')">
+                                Manual input
+                            </div>
+
+                            <!-- Slider mode -->
+                            <input id="jumlah_minyak"
+                                name="JUMLAH_MINYAK"
+                                type="text"
+                                data-slider-min="0"
+                                data-slider-max="8.05"
+                                data-slider-step="0.001"
+                                data-slider-value="0"
+                                class="slider slider-input"
+                            />
+                            <span id="val_minyak" style="font-size:12px;font-weight:700;">0.000 g</span>
+
+                            <!-- Manual mode -->
+                            <input id="manual_jumlah_minyak" 
+                                class="manual-input"
+                                name="JUMLAH_MINYAK_MANUAL"
+                                type="number"
+                                step="0.001"
+                                placeholder="0.000"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Row 1: Surfactant Component (Right) -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                <path d="M2 17l10 5 10-5"></path>
+                                <path d="M2 12l10 5 10-5"></path>
+                            </svg>
+                            Surfactant Component
+                        </div>
+                        <div class="form-group">
+                            <label for="surfaktan">Type</label>
+                            <select id="surfaktan" name="SURFAKTAN" required>
+                                <option value="">-- Select --</option>
+                                {% for val in cat_values['SURFAKTAN'] %}
+                                    <option value="{{ val }}">{{ display_values['SURFAKTAN'][val] if val in display_values['SURFAKTAN'] else val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jumlah_surfaktan">Amount (g)</label>
+                            <!-- <input type="number" id="jumlah_surfaktan" name="JUMLAH_SURFAKTAN" step="0.001" placeholder="0.000" value="{{ form_data.JUMLAH_SURFAKTAN or '' }}" required> -->
+                            <div class="toggle-wrap">
+                                <input type="checkbox" id="toggle_surfaktan" onchange="toggleInput('surfaktan')"> Manual input
+                            </div>
+
+                            <input id="jumlah_surfaktan"
+                                name="JUMLAH_SURFAKTAN"
+                                type="text"
+                                data-slider-min="0"
+                                data-slider-max="3.75"
+                                data-slider-step="0.001"
+                                data-slider-value="0"
+                                class="slider slider-input"
+                            />
+                            <span id="val_surfaktan" style="font-size:12px;font-weight:700;">0.000 g</span>
+
+                            <input id="manual_jumlah_surfaktan" 
+                                class="manual-input"
+                                name="JUMLAH_SURFAKTAN_MANUAL"
+                                type="number"
+                                step="0.001"
+                                placeholder="0.000"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Metal Component (Left) -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            </svg>
+                            Metal Component
+                        </div>
+                        <div class="form-group">
+                            <label for="logam">Type</label>
+                            <select id="logam" name="LOGAM" required>
+                                <option value="">-- Select --</option>
+                                {% for val in cat_values['LOGAM'] %}
+                                    <option value="{{ val }}">{{ display_values['LOGAM'][val] if val in display_values['LOGAM'] else val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jumlah_logam">Amount (g)</label>
+                            <!-- <input type="number" id="jumlah_logam" name="JUMLAH_LOGAM" step="0.001" placeholder="0.000" value="{{ form_data.JUMLAH_LOGAM or '' }}" required> -->
+                            <div class="toggle-wrap">
+                                <input type="checkbox" id="toggle_logam" onchange="toggleInput('logam')"> Manual input
+                            </div>
+
+                            <input id="jumlah_logam"
+                                name="JUMLAH_LOGAM"
+                                type="text"
+                                data-slider-min="0"
+                                data-slider-max="3.75"
+                                data-slider-step="0.001"
+                                data-slider-value="0"
+                                class="slider slider-input"
+                            />
+                            <span id="val_logam" style="font-size:12px;font-weight:700;">0.000 g</span>
+
+                            <input id="manual_jumlah_logam" 
+                                class="manual-input"
+                                name="JUMLAH_LOGAM_MANUAL"
+                                type="number"
+                                step="0.001"
+                                placeholder="0.000"
+                            >
+
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Co-Surfactant Component (Right) -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                            Co-Surfactant Component
+                        </div>
+                        <div class="form-group">
+                            <label for="ko_surfaktan">Type</label>
+                            <select id="ko_surfaktan" name="KO_SURFAKTAN" required>
+                                <option value="">-- Select --</option>
+                                {% for val in cat_values['KO_SURFAKTAN'] %}
+                                    <option value="{{ val }}">{{ display_values['KO_SURFAKTAN'][val] if val in display_values['KO_SURFAKTAN'] else val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jumlah_ko_surfaktan">Amount (g)</label>
+
+                            <div class="toggle-wrap">
+                                <input type="checkbox" id="toggle_ko_surfaktan" onchange="toggleInput('ko_surfaktan')"> Manual input
+                            </div>
+
+                            <input id="jumlah_ko_surfaktan"
+                                name="JUMLAH_KO_SURFAKTAN"
+                                type="text"
+                                data-slider-min="0"
+                                data-slider-max="1.875"
+                                data-slider-step="0.001"
+                                data-slider-value="0"
+                                class="slider slider-input"
+                            />
+
+                            <span id="val_ko_surfaktan" style="font-size:12px;font-weight:700;">0.000 g</span>
+
+                            <input id="manual_jumlah_ko_surfaktan" 
+                                class="manual-input"
+                                name="JUMLAH_KO_SURFAKTAN_MANUAL"
+                                type="number"
+                                step="0.001"
+                                placeholder="0.000"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <!-- <button type="submit" class="submit-btn">Analyze & Predict Phase</button> -->
+            </form>
+        </div>
+
+        <!-- Right Column: Results & History Combined -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <h2>Results</h2>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="results-history-container">
+                    <!-- Prediction Result Section (Left) -->
+                    <div class="results-section">
+                        <div class="section-label">Prediction Result</div>
+                        <div class="result-main">
+                            <div class="result-label">Detected Phase Type</div>
+                            <div class="result-value" id="livePhase">-</div>
+                        </div>
+
+                        <div class="result-image">
+                            <img id="liveImg" src="/static/images/fasa/default.png" alt="Phase image">
+                        </div>
+                        <div class="result-image-caption" id="caption">Phase Visualization</div>
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <p>Adjust sliders to classify phase</p>
+                            </div>
+                    </div>
+
+                    <!-- History Section (Right) -->
+                    <!-- <div class="history-section">
+                        <div class="section-label">Prediction History</div>
+                        <div class="history-table-wrapper">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Oil</th>
+                                        <th>Surfactant</th>
+                                        <th>Metal</th>
+                                        <th>Co-Surf</th>
+                                        <th>Phase</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                {% if history %}
+                                    {% for h in history %}
+                                        <tr class="history-row">
+                                            <td>{{ h.form_data.MINYAK }}<br><span style="color: #6b7280; font-size: 0.65rem;">{{ h.form_data.JUMLAH_MINYAK }}g</span></td>
+                                            <td>{{ h.form_data.SURFAKTAN }}<br><span style="color: #6b7280; font-size: 0.65rem;">{{ h.form_data.JUMLAH_SURFAKTAN }}g</span></td>
+                                            <td>{{ h.form_data.LOGAM }}<br><span style="color: #6b7280; font-size: 0.65rem;">{{ h.form_data.JUMLAH_LOGAM }}g</span></td>
+                                            <td>{{ h.form_data.KO_SURFAKTAN }}<br><span style="color: #6b7280; font-size: 0.65rem;">{{ h.form_data.JUMLAH_KO_SURFAKTAN }}g</span></td>
+                                            <td><span class="prediction-badge">{{ h.prediction }}</span></td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td class="empty-cell">-</td>
+                                        <td class="empty-cell">-</td>
+                                        <td class="empty-cell">-</td>
+                                        <td class="empty-cell">-</td>
+                                        <td class="empty-cell">-</td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if history %}
+                        <div class="history-footer">
+                            <div class="pagination-info">
+                                <span id="showingStart">1</span>-<span id="showingEnd">5</span> of <span id="totalEntries">{{ history|length }}</span>
+                            </div>
+                            <div class="pagination-buttons">
+                                <button class="pagination-btn" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+                                <div class="page-numbers" id="pageNumbers"></div>
+                                <button class="pagination-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+
+            /* =============================
+            DYNAMIC METAL INPUT HANDLER
+            ============================= */
+            const logamSelect = document.getElementById("logam");
+            const jumlahLogamInput = document.getElementById("jumlah_logam");
+            const jumlahLogamGroup = jumlahLogamInput.parentElement;
+
+            const logamMapping = {{ logam_display_mapping | tojson }};
+
+            const dynamicContainer = document.createElement("div");
+            dynamicContainer.id = "logamSplitContainer";
+            jumlahLogamGroup.after(dynamicContainer);
+
+        });
+    </script>
+    <script>
+    const sliders = {}; // store slider objects
+
+    function bindSlider(sliderId, labelId) {
+        if (!sliders[sliderId]) {
+            sliders[sliderId] = new Slider("#" + sliderId, { tooltip: 'hide' });
+            sliders[sliderId].on("slideStop", function(val) {
+                document.getElementById(labelId).textContent = Number(val).toFixed(3) + " g";
+                autoPredict();
+            });
+        }
+    }
+
+
+
+
+    // Bind sliders
+    bindSlider("jumlah_minyak", "val_minyak");
+    bindSlider("jumlah_surfaktan", "val_surfaktan");
+    bindSlider("jumlah_logam", "val_logam");
+    bindSlider("jumlah_ko_surfaktan", "val_ko_surfaktan");
+    ["minyak","surfaktan","logam","ko_surfaktan"].forEach(id=>{
+        document.getElementById(id).addEventListener("change", autoPredict);
+    });
+    // Force initialize labels on load
+    ["minyak","surfaktan","logam","ko_surfaktan"].forEach(f=>{
+        document.getElementById("val_"+f).textContent =
+            Number(sliders["jumlah_"+f]?.getValue() ?? 0).toFixed(3) + " g";
+    });
+
+
+    // When Fe | Air split triggers, also convert the dynamic inputs to sliders later
+    document.addEventListener("change", function(e){
+        if(e.target.id === "logam") {
+            setTimeout(() => {
+                let dynamicInputs = document.querySelectorAll(".dynamic-logam-input");
+                dynamicInputs.forEach((inp, idx) => {
+                    // Replace number input w/ slider
+                    let id = "logam_split_" + idx;
+                    inp.id = id;
+                    inp.type="text";
+                    inp.setAttribute("data-slider-min","0");
+                    inp.setAttribute("data-slider-max","0.7");
+                    inp.setAttribute("data-slider-step","0.001");
+                    inp.setAttribute("data-slider-value","0");
+
+                    let span = document.createElement("span");
+                    span.id = "val_"+id;
+                    span.style="font-size:12px;font-weight:700;";
+                    span.textContent = "0.000 g";
+                    inp.after(span);
+
+                    bindSlider(id, "val_"+id);
+                });
+            }, 200);
+        }
+    });
+
+    </script>
+    <script>
+    function toggleInput(field) {
+        const slider = document.getElementById("jumlah_" + field);
+        const manual = document.getElementById("manual_jumlah_" + field);
+        const toggle = document.getElementById("toggle_" + field);
+        const label  = document.getElementById("val_" + field);
+
+        if (toggle.checked) {
+            // Switch to manual
+            slider.style.display = "none";
+            slider.disabled = true;
+
+            manual.style.display = "block";
+            manual.disabled = false;
+
+            // Set manual value from slider if empty
+            let val = sliders["jumlah_" + field]?.getValue() ?? 0;
+            manual.value = manual.value || val;
+
+            // Show & update label correctly
+            label.style.display = "inline-block";
+            label.textContent = Number(manual.value || 0).toFixed(3) + " g";
+
+            // Live update when typing
+            manual.oninput = () => {
+                label.textContent = Number(manual.value || 0).toFixed(3) + " g";
+                autoPredict();
+            };
+
+
+        } else {
+            // Back to slider
+            slider.style.display = "block";
+            slider.disabled = false;
+
+            manual.style.display = "none";
+            manual.disabled = true;
+
+            // Sync manual value back to slider
+            if (manual.value && sliders["jumlah_" + field]) {
+                sliders["jumlah_" + field].setValue(parseFloat(manual.value));
+            }
+
+            // Ensure label exists and updates
+            label.style.display = "inline-block";
+            let val = sliders["jumlah_" + field]?.getValue() ?? 0;
+            label.textContent = Number(val).toFixed(3) + " g";
+        }
+    }
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+        const fields = ["minyak","surfaktan","logam","ko_surfaktan"];
+
+        // Saat submit, tulis nilai aktual dari plugin slider ke value input
+        const form = document.querySelector("form");
+        form.addEventListener("submit", () => {
+            fields.forEach(f => {
+            const s = sliders["jumlah_" + f];
+            const el = document.getElementById("jumlah_" + f);
+            if (s && el) el.value = s.getValue(); // sinkronisasi nilai
+            });
+
+            // Sinkronkan slider dinamis untuk LOGAM split (jika ada)
+            document.querySelectorAll(".dynamic-logam-input").forEach((inp) => {
+            const sId = inp.id;           // contoh: logam_split_0
+            const sObj = sliders[sId];
+            if (sObj) inp.value = sObj.getValue();
+            });
+        });
+        });
+        // === AUTO PREDICT ON SLIDER CHANGE ===
+        let debounceTimer;
+
+        function autoPredict() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(runPredict, 400); // wait 400ms after stop moving slider
+        }
+
+        function getNumeric(field) {
+            // field: "minyak" | "surfaktan" | "logam" | "ko_surfaktan"
+            const toggle = document.getElementById("toggle_" + field);
+            const manual = document.getElementById("manual_jumlah_" + field);
+            const sliderId = "jumlah_" + field;
+
+            if (toggle && toggle.checked) {
+            return parseFloat((manual?.value || "0").toString().replace(",", ".")) || 0;
+            }
+
+            return parseFloat(sliders[sliderId]?.getValue() ?? 0) || 0;
+        }
+
+        async function runPredict() {
+            const data = {
+            MINYAK: document.getElementById("minyak").value,
+            "JUMLAH MINYAK (g)": getNumeric("minyak"),
+
+            SURFAKTAN: document.getElementById("surfaktan").value,
+            "JUMLAH SURFAKTAN (g)": getNumeric("surfaktan"),
+
+            LOGAM: document.getElementById("logam").value,
+            // ✅ selalu 1 angka total
+            "JUMLAH LOGAM (g)": getNumeric("logam"),
+
+            "Ko-Surfaktan": document.getElementById("ko_surfaktan").value,
+            "JUMLAH KO-SURFAKTRAN (g)": getNumeric("ko_surfaktan")
+            };
+
+            const res = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+            });
+
+            const result = await res.json();
+
+            const phaseBox = document.getElementById("livePhase");
+            const imgBox = document.getElementById("liveImg");
+            const caption = document.getElementById("caption");
+
+            if (result.phase) {
+            phaseBox.textContent = result.phase;
+            if (result.image) {
+                imgBox.src = result.image;
+                caption.textContent = `Visualization For Phase ${result.phase}`;
+            }
+            phaseBox.style.transition = "0.2s";
+            phaseBox.style.transform = "scale(1.2)";
+            setTimeout(() => phaseBox.style.transform = "scale(1)", 200);
+            }
+        }
+
+    </script>
+
+
+
+
+</body>
+</html>

@@ -743,56 +743,51 @@
             }
         }
 
-        /* ===========================
-        MOBILE RESPONSIVE OVERRIDES
-        taruh PALING BAWAH sebelum </style>
-        =========================== */
-
         @media (max-width: 640px) {
-        /* Biar halaman bisa scroll normal (hindari nested scroll di HP) */
-        .main-container { 
-            overflow: visible; 
-            padding: 0.75rem;
-        }
+            /* Biar halaman bisa scroll normal (hindari nested scroll di HP) */
+            .main-container { 
+                overflow: visible; 
+                padding: 0.75rem;
+            }
 
-        .card,
-        .results-history-container,
-        .results-section,
-        .card-content,
-        .input-grid {
-            overflow: visible !important;
-        }
+            .card,
+            .results-history-container,
+            .results-section,
+            .card-content,
+            .input-grid {
+                overflow: visible !important;
+            }
 
-        /* Input jadi 1 kolom */
-        .input-grid {
-            grid-template-columns: 1fr !important;
-        }
+            /* Input jadi 1 kolom */
+            .input-grid {
+                grid-template-columns: 1fr !important;
+            }
 
-        /* Header & model path biar ga mepet */
-        .header {
-            padding: 0.65rem 0.9rem;
-            text-align: center;
-        }
+            /* Header & model path biar ga mepet */
+            .header {
+                padding: 0.65rem 0.9rem;
+                text-align: center;
+            }
 
-        .card-header {
-            gap: 0.6rem;
-        }
+            .card-header {
+                gap: 0.6rem;
+            }
 
-        .model-path-wrapper {
-            flex-direction: column;
-            align-items: stretch;
-            max-width: 100% !important;
-        }
+            .model-path-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                max-width: 100% !important;
+            }
 
-        .current-model-badge {
-            align-self: flex-start;
-        }
+            .current-model-badge {
+                align-self: flex-start;
+            }
 
-        /* Biar gambar/result ga kepotong */
-        img {
-            max-width: 100%;
-            height: auto;
-        }
+            /* Biar gambar/result ga kepotong */
+            img {
+                max-width: 100%;
+                height: auto;
+            }
         }
 
         @media (max-width: 420px) {

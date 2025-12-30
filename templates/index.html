@@ -706,42 +706,39 @@
 
 
         @media (max-width: 768px) {
-            .header {
-                padding: 0.5rem 1rem;
-            }
-
-            .header h1 {
-                font-size: 1rem;
-            }
-
-            .header p {
-                font-size: 0.75rem;
-            }
-
+            /* pastikan scrollnya di page, bukan di card */
             .main-container {
-                gap: 0.75rem;
-                padding: 0.75rem;
+                display: flex !important;
+                flex-direction: column !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                gap: 1rem !important;
             }
 
-            .card-header {
-                padding: 0.75rem;
-                flex-direction: column;
-                align-items: flex-start;
+            .card,
+            .card-content,
+            .input-grid,
+            .results-section {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
             }
 
-            .model-path-wrapper {
-                width: 100%;
-                max-width: 100%;
+            /* rapikan padding biar gak “gemuk” */
+            .card-content { padding: 1rem !important; }
+
+            /* gambar jangan kegedean di mobile */
+            .result-image {
+                min-height: 160px !important;
+                max-height: 220px !important;
             }
 
-            .card-content {
-                padding: 0.75rem;
-            }
-
-            .form-section {
-                padding: 0.625rem;
+            .result-value {
+                font-size: clamp(1.4rem, 6vw, 1.9rem) !important;
+                padding: 0.9rem !important;
             }
         }
+
 
         @media (max-width: 640px) {
             /* Biar halaman bisa scroll normal (hindari nested scroll di HP) */
@@ -1048,18 +1045,23 @@
                             <div class="result-value" id="livePhase">-</div>
                         </div>
 
-                        <div class="result-image">
-                            <img id="liveImg" src="/static/images/fasa/default.png" alt="Phase image">
-                        </div>
-                        <div class="result-image-caption" id="caption">Phase Visualization</div>
-                            <div class="empty-state">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                                </svg>
-                                <p>Adjust sliders to classify phase</p>
+                        <div id="phaseViz">
+                            <div class="result-image">
+                                <img id="liveImg" src="/static/images/fasa/default.png" alt="Phase image">
                             </div>
+                            <div class="result-image-caption" id="caption">Phase Visualization</div>
+                        </div>
+
+                        <div class="empty-state" id="emptyState">
+                            <!-- isi svg + teks kamu tetap -->
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <p>Adjust sliders to classify phase</p>
+                        </div>
+
                     </div>
 
                     <!-- History Section (Right) -->
@@ -1120,7 +1122,10 @@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
-
+            const emptyState = document.getElementById("emptyState");
+            const phaseViz = document.getElementById("phaseViz");
+            if (emptyState) emptyState.style.display = "flex";
+            if (phaseViz) phaseViz.style.display = "none";
             /* =============================
             DYNAMIC METAL INPUT HANDLER
             ============================= */
@@ -1289,6 +1294,8 @@
         }
 
         async function runPredict() {
+            const emptyState = document.getElementById("emptyState");
+            const phaseViz = document.getElementById("phaseViz");
             const data = {
             MINYAK: document.getElementById("minyak").value,
             "JUMLAH MINYAK (g)": getNumeric("minyak"),
@@ -1317,15 +1324,27 @@
             const caption = document.getElementById("caption");
 
             if (result.phase) {
-            phaseBox.textContent = result.phase;
-            if (result.image) {
-                imgBox.src = result.image;
-                caption.textContent = `Visualization For Phase ${result.phase}`;
+                phaseBox.textContent = result.phase;
+
+                // show image, hide empty state
+                if (emptyState) emptyState.style.display = "none";
+                if (phaseViz) phaseViz.style.display = "block";
+
+                if (result.image) {
+                    imgBox.src = result.image;
+                    caption.textContent = `Visualization For Phase ${result.phase}`;
+                }
+
+                phaseBox.style.transition = "0.2s";
+                phaseBox.style.transform = "scale(1.2)";
+                setTimeout(() => (phaseBox.style.transform = "scale(1)"), 200);
+            } else {
+                // belum ada hasil
+                phaseBox.textContent = "-";
+                if (emptyState) emptyState.style.display = "flex";
+                if (phaseViz) phaseViz.style.display = "none";
             }
-            phaseBox.style.transition = "0.2s";
-            phaseBox.style.transform = "scale(1.2)";
-            setTimeout(() => phaseBox.style.transform = "scale(1)", 200);
-            }
+
         }
 
     </script>
